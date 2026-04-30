@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { LayoutDashboard, Package, ShoppingCart, Users, Settings, BarChart3, DollarSign, ShoppingBasket } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, DollarSign, ShoppingBasket, LogOut } from 'lucide-react'
+import { LogoutButton } from '@/components/admin/logout-button'
 
 export default function AdminLayout({
   children,
@@ -9,13 +10,13 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border flex-shrink-0 hidden md:block">
+      <aside className="w-64 bg-card border-r border-border flex-shrink-0 hidden md:flex md:flex-col">
         <div className="p-6 border-b border-border">
           <Link href="/admin" className="text-xl font-bold text-primary neon-text">
             EN SHOES Admin
           </Link>
         </div>
-        <nav className="p-4">
+        <nav className="p-4 flex-1">
           <ul className="space-y-2">
             <li>
               <Link 
@@ -82,13 +83,14 @@ export default function AdminLayout({
             </li>
           </ul>
         </nav>
-        <div className="absolute bottom-4 left-4 right-4">
+        <div className="p-4 border-t border-border space-y-2">
           <Link 
             href="/"
             className="block text-center text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             ← Voltar para a loja
           </Link>
+          <LogoutButton />
         </div>
       </aside>
 
