@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ShoppingBag, Menu, X, Settings } from 'lucide-react'
+import { ShoppingBag, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { useCart } from '@/contexts/cart-context'
 import { Button } from '@/components/ui/button'
@@ -30,10 +30,6 @@ export function Header() {
             </Link>
             <Link href="/politicas" className="text-foreground/80 hover:text-primary transition-colors">
               Políticas
-            </Link>
-            <Link href="/admin" className="text-foreground/80 hover:text-primary transition-colors flex items-center gap-1">
-              <Settings className="h-4 w-4" />
-              Painel Admin
             </Link>
           </nav>
 
@@ -93,14 +89,6 @@ export function Header() {
                 onClick={() => setMenuOpen(false)}
               >
                 Políticas
-              </Link>
-              <Link 
-                href="/admin" 
-                className="text-foreground/80 hover:text-primary transition-colors flex items-center gap-2"
-                onClick={() => setMenuOpen(false)}
-              >
-                <Settings className="h-4 w-4" />
-                Painel Admin
               </Link>
             </div>
           </nav>
