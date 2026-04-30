@@ -43,13 +43,38 @@ export async function updateSession(request: NextRequest) {
       url.pathname = '/admin/login'
       return NextResponse.redirect(url)
     }
+
+    // Check if user is admin in admin_users table
+    const { data: adminUser } = await supabase
+      .from('admin_users')
+      .select('id, role')
+      .or(`email.eq.${user.email},user_id.eq.${user.id}`)
+      .eq('role', 'admin')
+      .single()
+
+    if (!adminUser) {
+      // User is logged in but not an admin
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/login'
+      url.searchParams.set('error', 'unauthorized')
+      return NextResponse.redirect(url)
+    }
   }
 
-  // If user is logged in and trying to access login, redirect to admin
+  // If user is logged in and trying to access login, check if admin and redirect
   if (request.nextUrl.pathname === '/admin/login' && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/admin'
-    return NextResponse.redirect(url)
+    const { data: adminUser } = await supabase
+      .from('admin_users')
+      .select('id, role')
+      .or(`email.eq.${user.email},user_id.eq.${user.id}`)
+      .eq('role', 'admin')
+      .single()
+
+    if (adminUser) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin'
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse

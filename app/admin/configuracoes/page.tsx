@@ -35,7 +35,12 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<{
+    message: string
+    code?: string
+    details?: string
+    hint?: string
+  } | null>(null)
 
   useEffect(() => {
     loadSettings()
@@ -51,7 +56,12 @@ export default function AdminSettingsPage() {
         .single()
 
       if (fetchError && fetchError.code !== 'PGRST116') {
-        console.log('[v0] Error loading settings:', fetchError.message)
+        setError({
+          message: fetchError.message,
+          code: fetchError.code,
+          details: fetchError.details,
+          hint: fetchError.hint
+        })
       }
 
       if (data) {
@@ -107,9 +117,18 @@ export default function AdminSettingsPage() {
 
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao salvar configurações'
-      setError(errorMessage)
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'message' in err) {
+        const supaError = err as { message: string; code?: string; details?: string; hint?: string }
+        setError({
+          message: supaError.message,
+          code: supaError.code,
+          details: supaError.details,
+          hint: supaError.hint
+        })
+      } else {
+        setError({ message: 'Erro ao salvar configurações' })
+      }
     } finally {
       setSaving(false)
     }
@@ -137,9 +156,17 @@ export default function AdminSettingsPage() {
       </div>
 
       {error && (
-        <div className="mb-6 flex items-center gap-2 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500">
-          <AlertCircle className="h-5 w-5 flex-shrink-0" />
-          <p>{error}</p>
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            <p className="font-medium">Erro ao carregar/salvar configurações</p>
+          </div>
+          <div className="text-sm font-mono space-y-1">
+            <p><strong>message:</strong> {error.message}</p>
+            {error.code && <p><strong>code:</strong> {error.code}</p>}
+            {error.details && <p><strong>details:</strong> {error.details}</p>}
+            {error.hint && <p><strong>hint:</strong> {error.hint}</p>}
+          </div>
         </div>
       )}
 
