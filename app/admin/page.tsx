@@ -198,16 +198,6 @@ export default async function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Aviso de dados administrativos */}
-      <Card className="bg-yellow-950/20 border-yellow-500/30 mb-8">
-        <CardContent className="py-4">
-          <p className="text-yellow-500 text-sm flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4" />
-            Dados administrativos (clientes, pedidos, carrinhos) ainda não disponíveis. Configure as permissões RLS no Supabase.
-          </p>
-        </CardContent>
-      </Card>
-
       {/* Lista de Produtos */}
       <Card className="bg-card border-border">
         <CardHeader>

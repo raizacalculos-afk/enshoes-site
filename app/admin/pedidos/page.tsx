@@ -30,7 +30,14 @@ interface Order {
 
 const WHATSAPP_NUMBER = '5511958046787'
 
-async function getOrders(): Promise<{ orders: Order[], error?: string }> {
+interface SupabaseError {
+  message: string
+  code?: string
+  details?: string
+  hint?: string
+}
+
+async function getOrders(): Promise<{ orders: Order[], error?: SupabaseError }> {
   try {
     const supabase = await createClient()
     const { data, error } = await supabase
@@ -39,12 +46,20 @@ async function getOrders(): Promise<{ orders: Order[], error?: string }> {
       .order('created_at', { ascending: false })
     
     if (error) {
-      return { orders: [], error: error.message }
+      return { 
+        orders: [], 
+        error: {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        }
+      }
     }
     return { orders: data || [] }
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
-    return { orders: [], error: errorMessage }
+    return { orders: [], error: { message: errorMessage } }
   }
 }
 
@@ -86,19 +101,22 @@ export default async function AdminOrdersPage() {
           <p className="text-muted-foreground">Gerencie os pedidos da EN SHOES</p>
         </div>
 
-        <Card className="bg-yellow-950/20 border-yellow-500/30">
+        <Card className="bg-red-950/20 border-red-500/30">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-yellow-500">
+            <CardTitle className="flex items-center gap-2 text-red-500">
               <AlertTriangle className="h-5 w-5" />
-              Dados administrativos ainda não disponíveis
+              Erro ao carregar pedidos
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-yellow-400/80 font-mono bg-yellow-950/50 p-3 rounded">
-              {error}
-            </p>
-            <p className="text-muted-foreground mt-4 text-sm">
-              Configure as permissões RLS no Supabase para visualizar os pedidos.
+          <CardContent className="space-y-2">
+            <div className="text-sm font-mono bg-red-950/50 p-3 rounded space-y-1">
+              <p className="text-red-400"><strong>message:</strong> {error.message}</p>
+              {error.code && <p className="text-red-400/80"><strong>code:</strong> {error.code}</p>}
+              {error.details && <p className="text-red-400/80"><strong>details:</strong> {error.details}</p>}
+              {error.hint && <p className="text-red-400/80"><strong>hint:</strong> {error.hint}</p>}
+            </div>
+            <p className="text-muted-foreground text-sm">
+              Verifique se as tabelas orders, customers e order_items existem e se as permissões RLS estão configuradas.
             </p>
           </CardContent>
         </Card>
